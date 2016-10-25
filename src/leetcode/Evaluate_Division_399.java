@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by cyan <chenyr626@gmail.com> on 2016/10/24.
- * function:
+ * Created by ewnit <chenyr626@gmail.com> on 2016/10/24.
+ * function: not accepted yet
  */
 public class Evaluate_Division_399 {
 
