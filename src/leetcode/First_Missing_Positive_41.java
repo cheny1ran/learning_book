@@ -10,63 +10,81 @@ package leetcode;
  * <p/>
  * Your algorithm should run in O(n) time and uses constant space.
  *
- * @Author cyan
+ * @Author ewnit
  * @Date 16/10/22.
  */
 public class First_Missing_Positive_41 {
 
-    public int[] quickSort(int[] nums, int h, int p) {
-        if (p - h == 0) return nums;
-        if (p - h == 1) {
-            if (nums[p] < nums[h]) {
-                int tem = nums[h];
-                nums[h] = nums[p];
-                nums[p] = tem;
-            }
-            return nums;
+    /**
+     * siyang3 's good work
+     * The key here is to use swapping to keep constant space and also make use of the length of the array,
+     * which means there can be at most n positive integers. So each time we encounter an valid integer,
+     * find its correct position and swap. Otherwise we continue.
+     */
+    public int firstMissingPositive1(int[] A) {
+        int i = 0;
+        while(i < A.length){
+            if(A[i] == i+1 || A[i] <= 0 || A[i] > A.length) i++;
+            else if(A[A[i]-1] != A[i]) swap(A, i, A[i]-1);
+            else i++;
         }
-        int m = (p - h + 1) / 2;
-        int hh = h, pp = p;
-        while (hh < pp) {
-            while (hh < pp && nums[hh] < nums[m]) {
-                hh++;
+        i = 0;
+        while(i < A.length && A[i] == i+1) i++;
+        return i+1;
+    }
+
+    private void swap(int[] A, int i, int j){
+        int temp = A[i];
+        A[i] = A[j];
+        A[j] = temp;
+    }
+
+    /**
+     * my quick_sort solution
+     */
+    void quick_sort(int s[], int l, int r) {
+        if (l < r) {
+            int i = l, j = r, x = s[l];
+            while (i < j) {
+                while (i < j && s[j] >= x)
+                    j--;
+                if (i < j)
+                    s[i++] = s[j];
+
+                while (i < j && s[i] < x)
+                    i++;
+                if (i < j)
+                    s[j--] = s[i];
             }
-            while (hh < pp && nums[pp] > nums[m]) {
-                pp--;
-            }
-            int tem = nums[hh];
-            nums[hh] = nums[pp];
-            nums[pp] = tem;
+            s[i] = x;
+            quick_sort(s, l, i - 1);
+            quick_sort(s, i + 1, r);
         }
-        int tem = nums[m];
-        nums[m] = nums[pp];
-        nums[pp] = tem;
-        quickSort(nums, h, pp - 1);
-        quickSort(nums, pp + 1, p);
-        return nums;
     }
 
 
     public int firstMissingPositive(int[] nums) {
         //快排
-        int[] ans = quickSort(nums, 0, nums.length - 1);
-        int prev = nums[0];
-        int aa = prev + 1;
-        for (int i = 0; i < ans.length; i++) {
-            if (ans[i] - prev > 1) {
-                aa = prev + 1;
+        if(nums.length==0) return 1;
+        quick_sort(nums, 0, nums.length - 1);
+        int prev = 1;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i]==prev) {
+                prev++;
+            }else if(nums[i]<prev){
+                continue;
+            }else if(nums[i]>prev){
                 break;
             }
-            prev = ans[i];
         }
 
-        return aa;
+        return prev;
     }
 
     public static void main(String[] args) {
-        int[] nums = {9, 4, 2, 6, 5, 7, 1, 3};
-        new First_Missing_Positive_41().quickSort(nums, 0, nums.length - 1);
-        System.out.println(nums);
+        int[] nums = {-1,0,1,2,4};
+        System.out.println(new First_Missing_Positive_41().firstMissingPositive1(nums));
+
     }
 
 }

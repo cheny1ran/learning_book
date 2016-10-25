@@ -4,7 +4,7 @@ package leetcode;
  * 功能描述:
  * Given an integer n, return the number of trailing zeroes in n!.
  *
- * @Author cyan
+ * @Author ewnit
  * @Date 16/10/22.
  */
 public class Factorial_Trailing_Zeroes_172 {

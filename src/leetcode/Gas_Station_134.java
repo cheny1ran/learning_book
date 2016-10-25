@@ -11,7 +11,7 @@ package leetcode;
  * Note:
  * The solution is guaranteed to be unique.
  *
- * @Author cyan
+ * @Author ewnit
  * @Date 16/10/22.
  */
 public class Gas_Station_134 {

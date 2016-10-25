@@ -32,7 +32,7 @@ import java.util.List;
  * "FizzBuzz"
  * ]
  *
- * @Author cyan
+ * @Author ewnit
  * @Date 16/10/22.
  */
 public class Fizz_Buzz_412 {
