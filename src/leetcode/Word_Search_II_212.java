@@ -25,57 +25,70 @@ import java.util.List;
  */
 public class Word_Search_II_212 {
 
+    // 直接dfs不使用Trie的话会TLE
+    // TrieNode structure and buildTrie src:
+    // https://discuss.leetcode.com/topic/33246/java-15ms-easiest-solution-100-00/2
+    class TrieNode {
+        TrieNode[] next = new TrieNode[26];
+        String word;
+    }
+
+    public TrieNode buildTrie(String[] words) {
+        TrieNode root = new TrieNode();
+        for (String w : words) {
+            TrieNode p = root;
+            for (char c : w.toCharArray()) {
+                int i = c - 'a';
+                if (p.next[i] == null) p.next[i] = new TrieNode();
+                p = p.next[i];
+            }
+            p.word = w;
+        }
+        return root;
+    }
+
     public List<String> findWords(char[][] board, String[] words) {
         List<String> ans = new ArrayList<>();
         if (words == null || words.length == 0 || board == null || board.length == 0) return ans;
-        int[] valid = new int[words.length];
+        TrieNode root = buildTrie(words);
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
-                for (int k = 0; k < words.length; k++) {
-                    if (board[i][j] == words[k].charAt(0)) {
-                        if (valid[k] == 0) {
-                            int[][] visited = new int[board.length][board[0].length];
-                            visited[i][j] = 1;
-                            valid[k] = dfs(board, visited, i, j, words[k], 1);
-                        }
-                    }
-                }
+                int[][] visited = new int[board.length][board[0].length];
+                dfs(board, visited, i, j, root, ans);
             }
         }
-        for (int i = 0; i < valid.length; i++) {
-            if (valid[i] == 1 && !ans.contains(words[i])) {
-                ans.add(words[i]);
-            }
-        }
+
         return ans;
     }
 
     int[][] walk = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-    public int dfs(char[][] board, int[][] visited, int x, int y, String str, int index) {
-        if (index >= str.length()) return 1;
+    public void dfs(char[][] board, int[][] visited, int x, int y, TrieNode root, List<String> ans) {
+
+        char c = board[x][y];
+        if (visited[x][y] == 1 || root.next[c - 'a'] == null) return;
+        root = root.next[c - 'a'];
+        if (root.word != null) {
+            ans.add(root.word);
+            root.word = null;
+        }
+        visited[x][y] = 1;
         for (int i = 0; i < walk.length; i++) {
             int xx = x + walk[i][0];
             int yy = y + walk[i][1];
             if (xx >= 0 && xx < board.length && yy >= 0 && yy < board[0].length) {
-                if (visited[xx][yy] == 1) continue;
-                if (board[xx][yy] == str.charAt(index)) {
-                    visited[xx][yy] = 1;
-                    int valid = dfs(board, visited, xx, yy, str, index + 1);
-                    visited[xx][yy] = 0;
-                    if (valid == 1) return 1;
-                }
+                dfs(board, visited, xx, yy, root,ans);
             }
         }
-        return 0;
+        visited[x][y]=0;
     }
 
     public static void main(String[] args) {
-//        char[][] board = {{'o', 'a', 'a', 'n'}, {'e', 't', 'a', 'e'}, {'i', 'h', 'k', 'r'}, {'i', 'f', 'l', 'v'}};
-//        String[] words = {"oath", "pea", "eat", "rain"};
+        char[][] board = {{'o', 'a', 'a', 'n'}, {'e', 't', 'a', 'e'}, {'i', 'h', 'k', 'r'}, {'i', 'f', 'l', 'v'}};
+        String[] words = {"oath", "pea", "eat", "rain"};
 
-        char[][] board = {{'a', 'b','c'}, {'a', 'e','d'},{'a','f','g'}};
-        String[] words = {"abcdefg","gfedcbaaa","eaabcdgfa","befa","dgc","ade"};
+//        char[][] board = {{'a', 'b', 'c'}, {'a', 'e', 'd'}, {'a', 'f', 'g'}};
+//        String[] words = {"abcdefg", "gfedcbaaa", "eaabcdgfa", "befa", "dgc", "ade"};
 
         List<String> list = new Word_Search_II_212().findWords(board, words);
         for (String s : list) {
