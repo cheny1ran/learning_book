@@ -92,5 +92,9 @@ public class Tree {
      */
     class BST {
 
+        public void buildBST(int[] a) {
+
+        }
+
     }
 }

@@ -32,59 +32,113 @@ public class Course_Schedule_II_210 {
      * 1:0
      * 2:0
      * 3:1,2
+     * <p/>
+     * 考虑情况:
+     * 无前置课程->prerequisites为空
+     * 循环依赖 {1,0},{0,1}
+     * 依赖多节课
+     * bfs
+     * <p/>
+     * list ans
+     * Queue clzs
+     * for num in numCourses{
+     * clzs.push(num)
+     * while(!clzs.isEmpty()){
+     * int n=clzs.peek();//no delete
+     * for pair in prerequisties{
+     * if pair[0]==n:
+     * if(clzs.contains(pair[1]) return false;//is a loop
+     * clzs.push(pair[1])
+     * }
+     * if clzs.peek()==n:
+     * ans.add(n)
+     * <p/>
+     * }
+     * }
      */
-    public int[] findOrder(int numCourses, int[][] prerequisites) {
-        List<Integer> tem = new ArrayList<>();
+
+    //TLE
+    public int[] findOrder1(int numCourses, int[][] prerequisites) {
+
         Map<Integer, List<Integer>> map = new HashMap<>();
-        for (int i = 0; i < prerequisites.length; i++) {
-            int key = prerequisites[i][0];
-            int val = prerequisites[i][1];
-            if (map.containsKey(key)) {
-                map.get(key).add(val);
-            } else {
-                List<Integer> list = new ArrayList<>();
-                list.add(val);
-                map.put(key, list);
+        if (prerequisites != null || prerequisites.length != 0) {
+            for (int i = 0; i < prerequisites.length; i++) {
+                if (!map.containsKey(prerequisites[i][0])) {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(prerequisites[i][1]);
+                    map.put(prerequisites[i][0], list);
+                } else {
+                    List<Integer> list = map.get(prerequisites[i][0]);
+                    if (!list.contains(prerequisites[i][1]))
+                        list.add(prerequisites[i][1]);
+                }
             }
         }
-        int key = 0;
-        while (!map.isEmpty()) {
-            if (key >= prerequisites.length) break;
-            isValid(tem, map, prerequisites[key][0]);
-            key++;
-        }
+        List<Integer> tem = new ArrayList<>();
         int[] ans = new int[numCourses];
-        if (!tem.isEmpty()) {
-            for (int i = 0; i < tem.size(); i++) {
-                ans[i] = tem.get(i);
+        Stack<Integer> clzs = new Stack<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (tem.contains(i)) continue;
+            clzs.push(i);
+            while (!clzs.isEmpty()) {
+                int n = clzs.peek();
+                if (map.containsKey(n)) {
+                    for (int m : map.get(n)) {
+                        if (clzs.contains(m)) return new int[0];
+                        if (!tem.contains(m)) clzs.push(m);
+                    }
+                    map.remove(n);
+                }
+                if (clzs.peek() == n) {
+                    tem.add(n);
+                    clzs.pop();
+                }
             }
         }
-        int pos = tem.size();
-        if (key >= prerequisites.length && prerequisites.length != 0) return null;
-        if (tem.size() < numCourses) {
-            for (int i = 0; i < numCourses; i++) {
-                if (!tem.contains(i)) ans[pos++] = i;
-            }
+        int pos = 0;
+        for (int i : tem) {
+            ans[pos++] = i;
         }
         return ans;
     }
 
-    public void isValid(List<Integer> ans, Map<Integer, List<Integer>> map, int key) {
-        if (map.containsKey(key)) {
-            for (int k : map.get(key)) {
-                if (!map.containsKey(k) && !ans.contains(k)) {
-                    ans.add(k);
-                    map.remove(k);
-                }
-                if (!ans.contains(k)) return;
-            }
-            ans.add(key);
-            map.remove(key);
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] incLinkCounts = new int[numCourses];
+        List<List<Integer>> adjs = new ArrayList<>(numCourses);
+        initialiseGraph(incLinkCounts, adjs, prerequisites);
+        return solveByBFS(incLinkCounts, adjs);
+    }
+
+    private void initialiseGraph(int[] incLinkCounts, List<List<Integer>> adjs, int[][] prerequisites) {
+        int n = incLinkCounts.length;
+        while (n-- > 0) adjs.add(new ArrayList<Integer>());
+        for (int[] edge : prerequisites) {
+            incLinkCounts[edge[0]]++;
+            adjs.get(edge[1]).add(edge[0]);
         }
     }
 
+    private int[] solveByBFS(int[] incLinkCounts, List<List<Integer>> adjs) {
+        int[] order = new int[incLinkCounts.length];
+        Queue<Integer> toVisit = new ArrayDeque<>();
+        for (int i = 0; i < incLinkCounts.length; i++) {
+            if (incLinkCounts[i] == 0) toVisit.offer(i);
+        }
+        int visited = 0;
+        while (!toVisit.isEmpty()) {
+            int from = toVisit.poll();
+            order[visited++] = from;
+            for (int to : adjs.get(from)) {
+                incLinkCounts[to]--;
+                if (incLinkCounts[to] == 0) toVisit.offer(to);
+            }
+        }
+        return visited == incLinkCounts.length ? order : new int[0];
+    }
+
+
     public static void main(String[] args) {
-        int[][] course = {{0, 1}, {1, 0}};
-        new Course_Schedule_II_210().findOrder(2, course);
+        int[][] course = {{5, 8}, {3, 5}, {1, 9}, {4, 5}, {0, 2}, {1, 9}, {7, 8}, {4, 9}};
+        new Course_Schedule_II_210().findOrder(10, course);
     }
 }
