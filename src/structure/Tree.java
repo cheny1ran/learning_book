@@ -1,5 +1,7 @@
 package structure;
 
+import leetcode.Delete_Node_in_a_BST_450;
+
 /**
  * 功能描述:
  * 树:
@@ -94,6 +96,10 @@ public class Tree {
 
         public void buildBST(int[] a) {
 
+        }
+
+        public void deleteBSTNode(){
+            new Delete_Node_in_a_BST_450();
         }
 
     }
