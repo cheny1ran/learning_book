@@ -29,25 +29,51 @@ public class Trapping_Rain_Water_42 {
      * 2 in 1,2 less than 2 sum+=max(1,2)=6->(3,2)
      * 1 in
      */
-    public int trap(int[] height) {
-        Stack<Integer> stack = new Stack<Integer>();
-        int sum = 0;
-        for (int i = 0; i < height.length; i++) {
-            if (stack.isEmpty() && height[i] == 0) continue;
-            if (stack.isEmpty() || stack.peek() >= height[i]) {
-                stack.push(height[i]);
-                continue;
+//    public int trap(int[] height) {
+//        Stack<Integer> stack = new Stack<Integer>();
+//        int sum = 0;
+//        int k = 0;
+//        for (int i = 0; i < height.length; i++) {
+//            if (stack.isEmpty() && height[i] == 0) continue;
+//            if (stack.isEmpty() || stack.peek() >= height[i]) {
+//                stack.push(height[i]);
+//                continue;
+//            }
+//            int pre = Integer.MAX_VALUE;
+//
+//            while (!stack.isEmpty() && stack.peek() <= height[i]) {
+//                if (pre == Integer.MAX_VALUE) {
+//                    pre = stack.pop();
+//                    k++;
+//                    continue;
+//                }
+//                sum += (stack.peek() - pre) * k;
+//                pre = stack.pop();
+//                k++;
+//            }
+//            if (stack.isEmpty()) k = 0;
+//            stack.push(height[i]);
+//        }
+//        return sum;
+//    }
+
+    int trap(int[] A) {
+        int left = 0;
+        int right = A.length - 1;
+        int res = 0;
+        int maxleft = 0, maxright = 0;
+        while (left <= right) {
+            if (A[left] <= A[right]) {
+                if (A[left] >= maxleft) maxleft = A[left];
+                else res += maxleft - A[left];
+                left++;
+            } else {
+                if (A[right] >= maxright) maxright = A[right];
+                else res += maxright - A[right];
+                right--;
             }
-            int pre = height[i];
-            int k = 0;
-            while (!stack.isEmpty() && stack.peek() <= height[i]) {
-                if (pre < stack.peek()) sum += (stack.peek() - pre) * k;
-                pre = stack.pop();
-                k++;
-            }
-            stack.push(height[i]);
         }
-        return sum;
+        return res;
     }
 
     public int trap1(int[] A) {
@@ -68,7 +94,7 @@ public class Trapping_Rain_Water_42 {
     }
 
     public static void main(String[] args) {
-//        int[] he = {4,2,3};
+//        int[] he = {4, 2, 3};
 //        int[] he = {2, 1, 0, 2};
         int[] he = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
         System.out.println(new Trapping_Rain_Water_42().trap(he));

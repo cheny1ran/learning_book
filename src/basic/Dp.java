@@ -1,6 +1,7 @@
 package basic;
 
 import leetcode.Best_Time_to_Buy_and_Sell_Stock_with_Cooldown_309;
+import leetcode.Coin_Change_322;
 import leetcode.Decode_Ways_91;
 import leetcode.Maximal_Square_221;
 
@@ -18,6 +19,7 @@ public class Dp {
         new Best_Time_to_Buy_and_Sell_Stock_with_Cooldown_309();
         new Decode_Ways_91();
         new Maximal_Square_221();
+        new Coin_Change_322();
 
     }
 }
