@@ -47,6 +47,19 @@ public class Minimum_Number_of_Arrows_to_Burst_Balloons_452 {
      *          flag=true;
      *      if flag:
      *          add scope to lists
+     *
+     *
+     * if not sort first. the flowing case won't pass.
+     * // 3,9  {3,9}
+     * // 7,9  {7,12}
+     * // 7,8  {3,8}
+     * // 7,8  {6,8}
+     * // 7,8/9,10  {9,10}
+     * // 7,8/9,10  {2,9}
+     * // 7,8/9,10  {0,9}
+     * // 7,8/9,10  {3,9}
+     * // 7,8/9,10/0,6 {0,6}
+     * // 7,8/9,10/0,6 {2,8}
      */
 
     public int findMinArrowShots(int[][] points) {
