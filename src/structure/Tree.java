@@ -18,6 +18,10 @@ public class Tree {
         TreeNode left;
         TreeNode right;
         int val;
+
+        TreeNode(int val) {
+            this.val = val;
+        }
     }
 
     /**
@@ -91,15 +95,37 @@ public class Tree {
      */
     class BST {
 
-        public void buildBST(int[] a) {
-
+        public TreeNode buildBST(int[] a) {
+            TreeNode root = new TreeNode(a[0]);
+            for (int i = 1; i < a.length; i++) {
+                insert(root, a[i]);
+            }
+            return root;
         }
 
-        public void deleteBSTNode() {
-            new Delete_Node_in_a_BST_450();
-        }
+        public void insert(TreeNode root, int a) {
+            TreeNode node = new TreeNode(a);
+            if (root == null) {
+                root = node;
+                return;
+            }
 
+            if (a > root.val) {
+                if (root.right == null) {
+                    root.right = node;
+                } else insert(root.right, a);
+            } else {
+                if (root.left == null) {
+                    root.left = node;
+                } else insert(root.left, a);
+            }
+        }
     }
+
+    public void deleteBSTNode() {
+        new Delete_Node_in_a_BST_450();
+    }
+
 
     /**
      * Balanced Tree(B-Tree) 平衡多路查找树
@@ -303,13 +329,186 @@ public class Tree {
      * <p>
      * <特征>:
      * <p>
-     * 每个结点要么是红的要么是黑的。
-     * 根结点是黑的。
-     * 每个叶结点（叶结点即指树尾端NIL指针或NULL结点）都是黑的。
-     * 如果一个结点是红的，那么它的两个儿子都是黑的。
-     * 对于任意结点而言，其到叶结点树尾端NIL指针的每条路径都包含相同数目的黑结点。
+     * 1.每个结点要么是红的要么是黑的。
+     * 2.根结点是黑的。
+     * 3.每个叶结点（叶结点即指树尾端NIL指针或NULL结点）都是黑的。
+     * 4.如果一个结点是红的，那么它的两个儿子都是黑的。
+     * 5.对于任意结点而言，其到叶结点树尾端NIL指针的每条路径都包含相同数目的黑结点。
      */
-    class RedBlackTree {
+    static class RedBlackTree {
 
+        final static String RED = "red";
+        final static String BLACK = "black";
+
+        class RBTreeNode {
+            String color = RED;
+            RBTreeNode parent;
+            RBTreeNode left;
+            RBTreeNode right;
+            int val;
+
+            RBTreeNode(int val) {
+                this.val = val;
+                this.color = RED;
+            }
+        }
+
+        RBTreeNode insert(RBTreeNode root, int val) {
+            RBTreeNode node = new RBTreeNode(val);
+            if (root == null) {
+                node.color = BLACK;
+                root = node;
+            }
+
+            RBTreeNode cur = root;
+            while (true) {
+                if (val > cur.val) {
+                    if (cur.right == null) {
+                        node.parent = cur;
+                        cur.right = node;
+                        break;
+                    } else {
+                        cur = cur.right;
+                    }
+                } else {
+                    if (cur.left == null) {
+                        node.parent = cur;
+                        cur.left = node;
+                        break;
+                    } else {
+                        cur = cur.left;
+                    }
+                }
+            }
+            root = insertFix(root, node);
+            return root;
+        }
+
+        // 插入:
+        // 插入节点默认是红 不然会违反性质5
+        // http://www.cnblogs.com/xuqiang/archive/2011/05/16/2047001.html
+        // http://blog.csdn.net/v_JULY_v/article/details/6284050
+        // 1.根节点->直接标黑
+        // 2.父节点是黑色->插入的节点标红(满足性质5)
+        // 需要修复的情况:
+        // 1.父节点是红色 叔叔节点是红色->将原来为黑的祖父节点标红 父节点和叔叔节点标黑 标记当前节点为祖父节点
+        // 2.父节点是红色 叔叔节点是黑色 插入父节点右侧->标记当前节点为父节点 以新的当前节点为支点左旋
+        // 3.父节点是红色 叔叔节点是黑色 插入父节点左侧->将原来为黑的祖父节点标红 父节点标黑 以祖父节点为支点右旋
+        private RBTreeNode insertFix(RBTreeNode root, RBTreeNode node) {
+            // 根节点||父节点是黑色
+            if (node.parent == null || node.parent.color.equals(BLACK)) {
+                return root;
+            } else {
+                RBTreeNode father = node.parent;
+                RBTreeNode grandfather = father.parent;
+                RBTreeNode uncle = (grandfather.left != null && grandfather.left.equals(father)) ?
+                        grandfather.right : grandfather.left;
+                if (uncle == null) {
+                    if (father.equals(grandfather.left)) {
+                        if (father.right != null && father.right.equals(node)) {
+                            leftRotate(father);
+                            father = node;
+                        }
+                        rightRotate(grandfather);
+                        grandfather.color = RED;
+                        father.color = BLACK;
+                        if (root.equals(grandfather)) {
+                            root = father;
+                        }
+                    } else {
+                        if (father.left != null && father.left.equals(node)) {
+                            rightRotate(father);
+                            father = node;
+                        }
+                        leftRotate(grandfather);
+                        grandfather.color = RED;
+                        father.color = BLACK;
+                        if (root.equals(grandfather)) {
+                            root = father;
+                        }
+                    }
+
+                } else {
+                    // 修复情况1
+                    if (uncle.color.equals(RED)) {
+                        father.color = BLACK;
+                        uncle.color = BLACK;
+                        if (grandfather.parent != null) {
+                            grandfather.color = RED;
+                            root = insertFix(root, grandfather);
+                        }
+                    } else {
+                        // 修复情况2
+                        if (father.right.equals(node)) {
+                            leftRotate(father);
+                            if (root.equals(father)) {
+                                root = node;
+                            }
+                            root = insertFix(root, father);
+                        } else {
+                            // 修复情况3
+                            father.color = BLACK;
+                            grandfather.color = RED;
+                            rightRotate(grandfather);
+                            if (root.equals(grandfather)) {
+                                root = grandfather.left;
+                            }
+                            root = insertFix(root, node);
+                        }
+                    }
+                }
+            }
+            root.color = BLACK;
+            return root;
+        }
+
+        // 使右孩子成为子树的新根
+        private void leftRotate(RBTreeNode center) {
+            if (center == null || center.right == null) return;
+
+            RBTreeNode right = center.right;
+            if (right.left != null) {
+                center.right = right.left;
+            } else center.right = null;
+
+            right.left = center;
+            if (center.parent != null) {
+                if (center.val < center.parent.val) {
+                    center.parent.left = right;
+                } else center.parent.right = right;
+            }
+            right.parent = center.parent;
+            center.parent = right;
+        }
+
+        // 使左孩子成为新根
+        private void rightRotate(RBTreeNode center) {
+            if (center == null || center.left == null) return;
+
+            RBTreeNode left = center.left;
+            if (left.right != null) {
+                center.left = left.right;
+            } else center.left = null;
+
+            left.right = center;
+            if (center.parent != null) {
+                if (center.val < center.parent.val) {
+                    center.parent.left = left;
+                } else center.parent.right = left;
+            }
+            left.parent = center.parent;
+            center.parent = left;
+        }
+    }
+
+    public static void main(String[] args) {
+        RedBlackTree tree = new RedBlackTree();
+        RedBlackTree.RBTreeNode root = tree.new RBTreeNode(12);
+        root.color = RedBlackTree.BLACK;
+        int[] vals = {1, 9, 2, 0, 11, 7, 19, 4, 15, 18, 5, 14, 13, 10, 16, 6, 3, 8, 17};
+        for (int val : vals) {
+            root = tree.insert(root, val);
+        }
+        System.out.println(root.val);
     }
 }
