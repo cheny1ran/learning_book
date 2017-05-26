@@ -18,9 +18,7 @@ public class Lexicographical_Numbers_386 {
 
     // very much like tree node DFS
     public List<Integer> lexicalOrder(int n) {
-        List<Integer> ans = new ArrayList<>();
-        ans.addAll(DFS(1, n));
-        return ans;
+        return DFS(1, n);
     }
 
     public List<Integer> DFS(int num, int n) {
