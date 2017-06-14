@@ -55,6 +55,8 @@ public class Dp {
         new Maximal_Square_221();
         new Coin_Change_322();
         new Palindrome_Partitioning_II_132();
+        new Wildcard_Matching_44();
+        new Word_Break_139();
 
     }
 }
